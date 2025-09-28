@@ -16,7 +16,7 @@ const popularMovies = [
   'Sikander 2', 'Yaar Anmulle', 'Parasite', 'Gladiator', 'Joker', 'Whiplash', 
   'The Prestige', 'Taarzan: The Wonder Car', 'Sholay', 'Ashke',
   'Spider-Man: Into the Spider-Verse', 'Saving Private Ryan', 'The Green Mile','Rabb da Radio 2', 
-  'The Avengers', 'Yaar Jigree Kasooti Degree'
+  'The Avengers', 'Angrej'
 ];
 
 const levenshteinDistance = (s1, s2) => {
