@@ -2,7 +2,7 @@
   "name": "find-my-moviez",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://varunshah27.github.io/FindMyMovies/",
+  "homepage": "https://varunshah27.github.io/FindMyMovies",
   "dependencies": {
     "axios": "^1.12.2",
     "react": "^19.1.1",
