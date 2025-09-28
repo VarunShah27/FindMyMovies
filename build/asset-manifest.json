@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/FindMyMovies/static/css/main.cb64ff8f.css",
+    "main.js": "/FindMyMovies/static/js/main.71c5cbac.js",
+    "static/js/453.548b2fe8.chunk.js": "/FindMyMovies/static/js/453.548b2fe8.chunk.js",
+    "index.html": "/FindMyMovies/index.html",
+    "main.cb64ff8f.css.map": "/FindMyMovies/static/css/main.cb64ff8f.css.map",
+    "main.71c5cbac.js.map": "/FindMyMovies/static/js/main.71c5cbac.js.map",
+    "453.548b2fe8.chunk.js.map": "/FindMyMovies/static/js/453.548b2fe8.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.cb64ff8f.css",
+    "static/js/main.71c5cbac.js"
+  ]
+}
