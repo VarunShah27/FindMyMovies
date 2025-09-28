@@ -1,5 +1,5 @@
 {
-  "short_name": "React App",
+  "short_name": "Find My Movies",
   "name": "Create React App Sample",
   "icons": [
     {
@@ -18,7 +18,7 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": ".",
+  "start_url": "https://varunshah27.github.io/FindMyMovies/manifest.json",
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff"
