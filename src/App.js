@@ -8,9 +8,6 @@ import Popup from "./components/Popup";
 import Suggestion from "./components/Suggestion";
 import ThemeToggle from "./components/ThemeToggle";
 
-// Add this console.log for debugging
-console.log("API Key Loaded:", process.env.REACT_APP_TMDB_API_KEY);
-
 const API_KEY = process.env.REACT_APP_TMDB_API_KEY;
 const BASE_URL = "https://api.themoviedb.org/3";
 const IMAGE_BASE = "https://image.tmdb.org/t/p/w342";
@@ -62,20 +59,22 @@ function App() {
         axios.get(`${BASE_URL}/search/movie`, {
           params: { api_key: API_KEY, query: title, language: "en-US" },
         }).then(res => processMovieData(res.data.results?.[0]))
-          .catch(() => null)
+          // --- THIS IS THE ONLY CHANGE ---
+          .catch(err => {
+            console.error(`Error fetching movie "${title}":`, err.response || err.message);
+            return null;
+          })
       );
 
       try {
         const movies = await Promise.all(moviePromises);
         const validMovies = movies.filter(Boolean);
         
-        // --- NEW IMPROVED CHECK ---
         if (validMovies.length === 0) {
-          setError("Could not fetch any movies. Please verify your API key is correct and active.");
+          setError("Could not fetch any movies. Please double-check your API key and network connection.");
         } else {
           setResults(validMovies);
         }
-
       } catch (err) {
         setError("An unexpected error occurred. Check the console for details.");
       } finally {
@@ -91,7 +90,6 @@ function App() {
     setLoading(true);
     setError(null);
     setSuggestion("");
-
     try {
       const { data } = await axios.get(`${BASE_URL}/search/movie`, {
         params: { api_key: API_KEY, query: term, language: "en-US" },
@@ -115,10 +113,8 @@ function App() {
       });
 
       const [{ data: details }, { data: credits }] = await Promise.all([detailsPromise, creditsPromise]);
-      
       const director = credits.crew?.find(c => c.job === "Director");
       const cast = credits.cast?.slice(0, 5).map(c => c.name).join(", ");
-
       setSelected({
         ...details,
         director: director ? director.name : "N/A",
@@ -139,7 +135,6 @@ function App() {
   const renderContent = () => {
     if (loading) return <h3 className="status-message">Loading movies...</h3>;
     if (error) return <h3 className="status-message error">{error}</h3>;
-    // Only show "No movies found" if there's no error and results are empty (e.g., a valid search with 0 results)
     if (results.length === 0) return (
       <section className="results-empty">
         <h3>No movies found. Try another search!</h3>
