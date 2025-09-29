@@ -17,7 +17,7 @@ const popularMovies = [
   "Superman", "The Godfather", "Nikka Zaildar", "Dune: Part Two",
   "Ballerina","Carry on Jatta", "Mission: Impossible - The Final Reckoning", "The Matrix", "Ardaas", "The Conjuring: Last Rites",
   "Interstellar", "Chhaava", "PK", "Goreyan nu Daffa Karo", "Deadpool & Wolverine",
-  "Majnoo", "Saiyaara", "Sikander", "Yaar Anmulle", "F1",
+  "Dakuaan Da Munda 3", "Saiyaara", "Sikander", "Yaar Anmulle", "F1",
   "Gladiator", "Joker", "Furiosa: A Mad Max Saga", "Taarzan: The Wonder Car",
   "Sholay", "Chal Mera Putt 1", "Spider-Man: Into the Spider-Verse", "Transformers",
   "Rabb da Radio 2", "The Avengers", "Angrej"
