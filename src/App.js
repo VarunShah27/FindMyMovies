@@ -8,7 +8,8 @@ import Popup from "./components/Popup";
 import Suggestion from "./components/Suggestion";
 import ThemeToggle from "./components/ThemeToggle";
 
-const API_KEY = "05de3799f13701e05ffa7144adef9ef7";
+// Get API Key from environment variables
+const API_KEY = process.env.REACT_APP_TMDB_API_KEY;
 const BASE_URL = "https://api.themoviedb.org/3";
 const IMAGE_BASE = "https://image.tmdb.org/t/p/w342";
 const HOME_LIMIT = 16;
@@ -24,85 +25,115 @@ const popularMovies = [
 ];
 
 function App() {
-  const [state, setState] = useState({ s: "", results: [], selected: {} });
+  // Use multiple useState hooks for cleaner state management
+  const [searchTerm, setSearchTerm] = useState("");
+  const [results, setResults] = useState([]);
+  const [selected, setSelected] = useState(null); // Use null for clarity
   const [suggestion, setSuggestion] = useState("");
+  const [loading, setLoading] = useState(true); // State to handle loading UI
+  const [error, setError] = useState(null); // State to handle API errors
 
-  useEffect(() => {
-    const shuffled = popularMovies.sort(() => 0.5 - Math.random());
-    const selectedMovies = shuffled.slice(0, HOME_LIMIT);
-
-    const moviePromises = selectedMovies.map((title) =>
-      axios.get(`${BASE_URL}/search/movie`, {
-        params: { api_key: API_KEY, query: title, language: "en-US" },
-      }).then(res => {
-        const movie = (res.data.results && res.data.results[0]) || null;
-        if (!movie) return null;
-        return {
-          ...movie,
-          poster_path: movie.poster_path
-            ? IMAGE_BASE + movie.poster_path
-            : "https://via.placeholder.com/342x513?text=No+Image",
-        };
-      }).catch(() => null)
-    );
-
-    Promise.all(moviePromises)
-      .then(movies => setState(prev => ({
-        ...prev,
-        results: movies.filter(Boolean)
-      })))
-      .catch(err => console.error(err));
-  }, []);
-
-  const search = (term) => {
-    if (!term) return;
-    axios.get(`${BASE_URL}/search/movie`, {
-      params: { api_key: API_KEY, query: term, language: "en-US" }
-    })
-    .then(({ data }) => {
-      const resultsWithPosters = (data.results || []).map(movie => ({
-        ...movie,
-        poster_path: movie.poster_path
-          ? IMAGE_BASE + movie.poster_path
-          : "https://via.placeholder.com/342x513?text=No+Image"
-      }));
-      setSuggestion("");
-      setState(prev => ({ ...prev, results: resultsWithPosters }));
-    })
-    .catch(err => console.error(err));
+  // Helper function to process movie data and create full poster URLs
+  const processMovieData = (movie) => {
+    if (!movie) return null;
+    return {
+      ...movie,
+      poster_path: movie.poster_path
+        ? `${IMAGE_BASE}${movie.poster_path}`
+        : "https://via.placeholder.com/342x513?text=No+Image",
+    };
   };
 
-  const handleInput = (e) => setState(prev => ({ ...prev, s: e.target.value }));
-  const handleSearchEvent = (e) => { if (e.key === "Enter") search(state.s); };
-  const handleSuggestionClick = (term) => { setState(prev => ({ ...prev, s: term })); search(term); };
+  useEffect(() => {
+    const fetchInitialMovies = async () => {
+      if (!API_KEY) {
+        setError("API Key is missing. Please add it to your .env file.");
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+
+      const shuffled = popularMovies.sort(() => 0.5 - Math.random());
+      const selectedTitles = shuffled.slice(0, HOME_LIMIT);
+
+      const moviePromises = selectedTitles.map((title) =>
+        axios.get(`${BASE_URL}/search/movie`, {
+          params: { api_key: API_KEY, query: title, language: "en-US" },
+        }).then(res => processMovieData(res.data.results?.[0]))
+          .catch(() => null) // Ignore individual movie fetch errors
+      );
+
+      try {
+        const movies = await Promise.all(moviePromises);
+        setResults(movies.filter(Boolean));
+      } catch (err) {
+        setError("Failed to fetch popular movies. Please check your connection or API key.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInitialMovies();
+  }, []);
+
+  const search = async (term) => {
+    if (!term) return;
+
+    setLoading(true);
+    setError(null);
+    setSuggestion("");
+
+    try {
+      const { data } = await axios.get(`${BASE_URL}/search/movie`, {
+        params: { api_key: API_KEY, query: term, language: "en-US" },
+      });
+      const resultsWithPosters = (data.results || []).map(processMovieData);
+      setResults(resultsWithPosters);
+    } catch (err) {
+      setError("Search failed. The API key might be invalid or the service is down.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const openPopup = async (id) => {
     try {
-      const { data: details } = await axios.get(`${BASE_URL}/movie/${id}`, {
+      const detailsPromise = axios.get(`${BASE_URL}/movie/${id}`, {
         params: { api_key: API_KEY, language: "en-US" },
       });
-      const { data: credits } = await axios.get(`${BASE_URL}/movie/${id}/credits`, {
+      const creditsPromise = axios.get(`${BASE_URL}/movie/${id}/credits`, {
         params: { api_key: API_KEY },
       });
 
-      const director = (credits.crew || []).find(c => c.job === "Director");
-      const cast = (credits.cast || []).slice(0, 5).map(c => c.name).join(", ");
+      const [{ data: details }, { data: credits }] = await Promise.all([detailsPromise, creditsPromise]);
+      
+      const director = credits.crew?.find(c => c.job === "Director");
+      const cast = credits.cast?.slice(0, 5).map(c => c.name).join(", ");
 
-      setState(prev => ({
-        ...prev,
-        selected: {
-          ...details,
-          director: director ? director.name : "N/A",
-          cast: cast || "N/A",
-          poster_path: details.poster_path
-            ? IMAGE_BASE + details.poster_path
-            : "https://via.placeholder.com/342x513?text=No+Image",
-        }
-      }));
-    } catch (err) { console.error(err); }
+      setSelected({
+        ...details,
+        director: director ? director.name : "N/A",
+        cast: cast || "N/A",
+        poster_path: processMovieData(details).poster_path,
+      });
+    } catch (err) {
+      console.error("Could not open popup:", err);
+      setError("Could not fetch movie details.");
+    }
   };
+  
+  const handleInput = (e) => setSearchTerm(e.target.value);
+  const handleSearchEvent = (e) => { if (e.key === "Enter") search(searchTerm); };
+  const handleSuggestionClick = (term) => { setSearchTerm(term); search(term); };
+  const closePopup = () => setSelected(null);
 
-  const closePopup = () => setState(prev => ({ ...prev, selected: {} }));
+  const renderContent = () => {
+    if (loading) return <h3 className="status-message">Loading movies...</h3>;
+    if (error) return <h3 className="status-message error">{error}</h3>;
+    return <Results results={results} openPopup={openPopup} />;
+  };
 
   return (
     <div className="App">
@@ -111,10 +142,10 @@ function App() {
         <h1><a href="/" style={{ textDecoration: "none", color: "inherit" }}>Find My Moviez</a></h1>
       </header>
       <main>
-        <Search handleInput={handleInput} search={handleSearchEvent} />
+        <Search value={searchTerm} handleInput={handleInput} search={handleSearchEvent} />
         {suggestion && <Suggestion suggestion={suggestion} onSuggestionClick={handleSuggestionClick} />}
-        <Results results={state.results} openPopup={openPopup} />
-        {state.selected.title && <Popup selected={state.selected} closePopup={closePopup} />}
+        {renderContent()}
+        {selected && <Popup selected={selected} closePopup={closePopup} />}
       </main>
     </div>
   );
