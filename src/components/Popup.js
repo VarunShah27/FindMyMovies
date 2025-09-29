@@ -18,7 +18,7 @@ function Popup({ selected, closePopup }) {
           <img src={poster} alt={selected.title} />
           <div className="info">
             <h2>{selected.title} <span>({year})</span></h2>
-            <p className="rating">Rating: ⭐ {selected.vote_average?.toFixed(1) || "N/A"}</p>
+            <p className="rating">Rating: ⭐ {selected.vote_average?.toFixed(1) / 10|| "N/A"}</p>
             <p><strong>Genre:</strong> {genres}</p>
             <p><strong>Director:</strong> {director}</p>
             <p><strong>Actors:</strong> {cast}</p><br/>
