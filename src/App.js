@@ -8,7 +8,9 @@ import Popup from "./components/Popup";
 import Suggestion from "./components/Suggestion";
 import ThemeToggle from "./components/ThemeToggle";
 
-// Get API Key from environment variables
+// Add this console.log for debugging
+console.log("API Key Loaded:", process.env.REACT_APP_TMDB_API_KEY);
+
 const API_KEY = process.env.REACT_APP_TMDB_API_KEY;
 const BASE_URL = "https://api.themoviedb.org/3";
 const IMAGE_BASE = "https://image.tmdb.org/t/p/w342";
@@ -25,15 +27,13 @@ const popularMovies = [
 ];
 
 function App() {
-  // Use multiple useState hooks for cleaner state management
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState([]);
-  const [selected, setSelected] = useState(null); // Use null for clarity
+  const [selected, setSelected] = useState(null);
   const [suggestion, setSuggestion] = useState("");
-  const [loading, setLoading] = useState(true); // State to handle loading UI
-  const [error, setError] = useState(null); // State to handle API errors
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Helper function to process movie data and create full poster URLs
   const processMovieData = (movie) => {
     if (!movie) return null;
     return {
@@ -46,14 +46,14 @@ function App() {
 
   useEffect(() => {
     const fetchInitialMovies = async () => {
+      setLoading(true);
+      setError(null);
+      
       if (!API_KEY) {
-        setError("API Key is missing. Please add it to your .env file.");
+        setError("API Key is missing. Make sure you have a .env file with REACT_APP_TMDB_API_KEY set.");
         setLoading(false);
         return;
       }
-
-      setLoading(true);
-      setError(null);
 
       const shuffled = popularMovies.sort(() => 0.5 - Math.random());
       const selectedTitles = shuffled.slice(0, HOME_LIMIT);
@@ -62,14 +62,22 @@ function App() {
         axios.get(`${BASE_URL}/search/movie`, {
           params: { api_key: API_KEY, query: title, language: "en-US" },
         }).then(res => processMovieData(res.data.results?.[0]))
-          .catch(() => null) // Ignore individual movie fetch errors
+          .catch(() => null)
       );
 
       try {
         const movies = await Promise.all(moviePromises);
-        setResults(movies.filter(Boolean));
+        const validMovies = movies.filter(Boolean);
+        
+        // --- NEW IMPROVED CHECK ---
+        if (validMovies.length === 0) {
+          setError("Could not fetch any movies. Please verify your API key is correct and active.");
+        } else {
+          setResults(validMovies);
+        }
+
       } catch (err) {
-        setError("Failed to fetch popular movies. Please check your connection or API key.");
+        setError("An unexpected error occurred. Check the console for details.");
       } finally {
         setLoading(false);
       }
@@ -80,7 +88,6 @@ function App() {
 
   const search = async (term) => {
     if (!term) return;
-
     setLoading(true);
     setError(null);
     setSuggestion("");
@@ -132,6 +139,12 @@ function App() {
   const renderContent = () => {
     if (loading) return <h3 className="status-message">Loading movies...</h3>;
     if (error) return <h3 className="status-message error">{error}</h3>;
+    // Only show "No movies found" if there's no error and results are empty (e.g., a valid search with 0 results)
+    if (results.length === 0) return (
+      <section className="results-empty">
+        <h3>No movies found. Try another search!</h3>
+      </section>
+    );
     return <Results results={results} openPopup={openPopup} />;
   };
 
