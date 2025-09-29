@@ -16,4 +16,4 @@ function Search({ handleInput, search }) {
   )
 }
 
-export default search
+export default Search
