@@ -2,7 +2,7 @@
 import React from "react";
 import Result from "./Result";
 
-const IMAGE_BASE_HERO = "https://image.tmdb.org/t/p/w500"; // bigger poster for hero/popup
+const IMAGE_BASE_HERO = "https://image.tmdb.org/t/p/w500"; // larger poster for hero view
 
 function Results({ results, openPopup }) {
   if (!results || results.length === 0) {
