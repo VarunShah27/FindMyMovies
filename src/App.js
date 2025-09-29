@@ -1,27 +1,32 @@
-import './App.css';
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import "./App.css";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
-// Import all components
-import Search from './components/Search';
-import Results from './components/Results';
-import Popup from './components/Popup';
-import Suggestion from './components/Suggestion';
-import ThemeToggle from './components/ThemeToggle';
+import Search from "./components/Search";
+import Results from "./components/Results";
+import Popup from "./components/Popup";
+import Suggestion from "./components/Suggestion";
+import ThemeToggle from "./components/ThemeToggle";
 
+const API_KEY = "5d048d70e2ec77e86219f7e5f1256f22";
+const BASE_URL = "https://api.themoviedb.org/3";
+const IMAGE_BASE = "https://image.tmdb.org/t/p/w342";
+const HOME_LIMIT = 16;
+
+// Curated popular movies (Hollywood, Bollywood, Pollywood)
 const popularMovies = [
-  'Inception', 'The Godfather','Nikka Zaildar', 'The Shawshank Redemption', 'Pulp Fiction',
-  'Forrest Gump', 'The Matrix','Ardaas', 'Goodfellas', 'Interstellar', 'Dhamaal', 'pk', 
-  'Goreyan nu Daffa Karo', 'Carry on Jatta', 'Manje Bistre', 'Housefull', 
-  'Sikander 2', 'Yaar Anmulle', 'Parasite', 'Gladiator', 'Joker', 'Whiplash', 
-  'The Prestige', 'Taarzan: The Wonder Car', 'Sholay', 'Ashke',
-  'Spider-Man: Into the Spider-Verse', 'Saving Private Ryan', 'The Green Mile','Rabb da Radio 2', 
-  'The Avengers', 'Angrej'
+  "Inception", "The Godfather", "Nikka Zaildar", "The Shawshank Redemption",
+  "Pulp Fiction","Carry on Jatta", "Forrest Gump", "The Matrix", "Ardaas", "Goodfellas",
+  "Interstellar", "Dhamaal", "PK", "Goreyan nu Daffa Karo", "The Green Mile",
+  "Manje Bistre", "Housefull 2", "Sikander 2", "Yaar Anmulle", "F1",
+  "Gladiator", "Joker", "Whiplash", "The Prestige", "Taarzan: The Wonder Car",
+  "Sholay", "Ashke", "Spider-Man: Into the Spider-Verse", "Transformers",
+  "Whiplash", "Rabb da Radio 2", "The Avengers", "Angrej"
 ];
 
+// Levenshtein distance for fuzzy suggestions
 const levenshteinDistance = (s1, s2) => {
-  s1 = s1.toLowerCase();
-  s2 = s2.toLowerCase();
+  s1 = s1.toLowerCase(); s2 = s2.toLowerCase();
   const costs = [];
   for (let i = 0; i <= s1.length; i++) {
     let lastValue = i;
@@ -45,51 +50,109 @@ const levenshteinDistance = (s1, s2) => {
 function App() {
   const [state, setState] = useState({ s: "", results: [], selected: {} });
   const [suggestion, setSuggestion] = useState("");
-  const apiurl = "https://api.themoviedb.org/3/search/movie?api_key=5d048d70e2ec77e86219f7e5f1256f22";
 
+  // Fetch 12–16 home page movies
   useEffect(() => {
     const shuffled = popularMovies.sort(() => 0.5 - Math.random());
-    const selectedMovies = shuffled.slice(0, 8);
-    const moviePromises = selectedMovies.map(title => axios(apiurl + "&t=" + title));
-    Promise.all(moviePromises).then(responses => {
-      const movies = responses.map(res => res.data);
-      setState(prevState => ({ ...prevState, results: movies }));
-    });
+    const selectedMovies = shuffled.slice(0, HOME_LIMIT);
+
+    const moviePromises = selectedMovies.map((title) =>
+      axios
+        .get(`${BASE_URL}/search/movie`, {
+          params: { api_key: API_KEY, query: title, language: "en-US" },
+        })
+        .then((res) => {
+          // Try exact title match first
+          const movie =
+            res.data.results.find(
+              (m) =>
+                m.title.toLowerCase() === title.toLowerCase() ||
+                m.original_title.toLowerCase() === title.toLowerCase()
+            ) || res.data.results[0];
+          if (!movie) return null;
+          return {
+            ...movie,
+            poster_path: movie.poster_path
+              ? IMAGE_BASE + movie.poster_path
+              : "https://via.placeholder.com/342x513?text=No+Image",
+          };
+        })
+    );
+
+    Promise.all(moviePromises)
+      .then((movies) => setState((prev) => ({ ...prev, results: movies.filter(Boolean) })))
+      .catch((err) => console.error("Home movies fetch error:", err));
   }, []);
 
+  // Search
   const search = (term) => {
-    axios(apiurl + "&s=" + term).then(({ data }) => {
-      const searchResults = data.Search;
-      if (!searchResults || searchResults.length === 0) {
-        let bestMatch = null;
-        let minDistance = Infinity;
-        popularMovies.forEach(movie => {
-          const distance = levenshteinDistance(term, movie);
-          if (distance < minDistance && distance <= 3) {
-            minDistance = distance;
-            bestMatch = movie;
-          }
-        });
-        setSuggestion(bestMatch);
-        setState(prevState => ({ ...prevState, results: [] }));
-      } else if (searchResults.length === 1) {
-        setSuggestion("");
-        axios(apiurl + "&i=" + searchResults[0].imdbID).then(({ data: detailedData }) => {
-          setState(prevState => ({ ...prevState, results: [detailedData] }));
-        });
-      } else {
-        setSuggestion("");
-        setState(prevState => ({ ...prevState, results: searchResults }));
-      }
-    }).catch(error => console.error("Search error:", error));
+    if (!term) return;
+    axios
+      .get(`${BASE_URL}/search/movie`, {
+        params: { api_key: API_KEY, language: "en-US", query: term },
+      })
+      .then(({ data }) => {
+        if (!data.results || data.results.length === 0) {
+          // Fuzzy suggestion
+          let bestMatch = null;
+          let minDistance = Infinity;
+          popularMovies.forEach((movie) => {
+            const distance = levenshteinDistance(term, movie);
+            if (distance < minDistance && distance <= 3) {
+              minDistance = distance;
+              bestMatch = movie;
+            }
+          });
+          setSuggestion(bestMatch);
+          setState((prev) => ({ ...prev, results: [] }));
+        } else {
+          const resultsWithPosters = data.results.map((movie) => ({
+            ...movie,
+            poster_path: movie.poster_path
+              ? IMAGE_BASE + movie.poster_path
+              : "https://via.placeholder.com/342x513?text=No+Image",
+          }));
+          setSuggestion("");
+          setState((prev) => ({ ...prev, results: resultsWithPosters }));
+        }
+      })
+      .catch((err) => console.error("Search error:", err));
   };
 
-  const handleInput = (e) => setState(prevState => ({ ...prevState, s: e.target.value }));
+  const handleInput = (e) => setState((prev) => ({ ...prev, s: e.target.value }));
   const handleSearchEvent = (e) => { if (e.key === "Enter") search(state.s); };
-  const handleSuggestionClick = (suggestedTerm) => { setState(prevState => ({ ...prevState, s: suggestedTerm })); search(suggestedTerm); };
+  const handleSuggestionClick = (suggestedTerm) => { setState((prev) => ({ ...prev, s: suggestedTerm })); search(suggestedTerm); };
 
-  const openPopup = (id) => { axios(apiurl + "&i=" + id).then(({ data }) => setState(prevState => ({ ...prevState, selected: data }))); };
-  const closePopup = () => setState(prevState => ({ ...prevState, selected: {} }));
+  // Popup with director and cast
+  const openPopup = async (id) => {
+    try {
+      const { data: details } = await axios.get(`${BASE_URL}/movie/${id}`, {
+        params: { api_key: API_KEY, language: "en-US" },
+      });
+
+      const { data: credits } = await axios.get(`${BASE_URL}/movie/${id}/credits`, {
+        params: { api_key: API_KEY },
+      });
+
+      const director = credits.crew.find((c) => c.job === "Director")?.name || "N/A";
+      const cast = credits.cast.slice(0, 5).map((c) => c.name).join(", ") || "N/A";
+
+      setState((prev) => ({
+        ...prev,
+        selected: {
+          ...details,
+          director,
+          cast,
+          poster_path: details.poster_path
+            ? IMAGE_BASE + details.poster_path
+            : "https://via.placeholder.com/342x513?text=No+Image",
+        },
+      }));
+    } catch (err) {
+      console.error("Popup fetch error:", err);
+    }
+  };
+  const closePopup = () => setState((prev) => ({ ...prev, selected: {} }));
 
   return (
     <div className="App">
@@ -99,9 +162,11 @@ function App() {
       </header>
       <main>
         <Search handleInput={handleInput} search={handleSearchEvent} />
-        {suggestion && <Suggestion suggestion={suggestion} onSuggestionClick={handleSuggestionClick} />}
+        {suggestion && (
+          <Suggestion suggestion={suggestion} onSuggestionClick={handleSuggestionClick} />
+        )}
         <Results results={state.results} openPopup={openPopup} />
-        {(typeof state.selected.Title !== "undefined") && <Popup selected={state.selected} closePopup={closePopup} />}
+        {state.selected.title && <Popup selected={state.selected} closePopup={closePopup} />}
       </main>
     </div>
   );
