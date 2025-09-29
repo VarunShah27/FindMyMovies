@@ -2,7 +2,8 @@
 import React from "react";
 import Result from "./Result";
 
-const IMAGE_BASE_HERO = "https://image.tmdb.org/t/p/w500"; // bigger poster for hero
+// Keep this for hero view, assuming w500 is desired here
+const IMAGE_BASE_HERO = "https://image.tmdb.org/t/p/w500";
 
 function Results({ results, openPopup }) {
   if (!results || results.length === 0) {
@@ -16,11 +17,10 @@ function Results({ results, openPopup }) {
   // Single movie hero view
   if (results.length === 1 && results[0].overview) {
     const movie = results[0];
-    const posterUrl = movie.poster_path
-      ? movie.poster_path.startsWith("http")
-        ? movie.poster_path
-        : `${IMAGE_BASE_HERO}${movie.poster_path}`
-      : "https://via.placeholder.com/500x750?text=No+Image";
+    // Reconstruct hero URL from base path for better quality
+    const posterUrl = movie.poster_path.includes("via.placeholder.com")
+      ? movie.poster_path
+      : `${IMAGE_BASE_HERO}${movie.poster_path.substring(movie.poster_path.lastIndexOf('/'))}`;
 
     return (
       <section className="single-result-hero" style={{ backgroundImage: `url(${posterUrl})` }}>
@@ -30,7 +30,7 @@ function Results({ results, openPopup }) {
           <div className="hero-details">
             <h1>{movie.title || "N/A"}</h1>
             <p className="hero-meta">
-              {movie.release_date ? movie.release_date.split("-")[0] : "N/A"} • ⭐ {movie.vote_average || "N/A"}/10
+              {movie.release_date ? movie.release_date.split("-")[0] : "N/A"} • ⭐ {movie.vote_average?.toFixed(1) || "N/A"}/10
             </p>
             <p className="hero-plot">{movie.overview || "No description available."}</p>
             <button onClick={() => openPopup(movie.id)}>Show More Info</button>
