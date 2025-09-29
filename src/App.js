@@ -8,7 +8,7 @@ import Popup from "./components/Popup";
 import Suggestion from "./components/Suggestion";
 import ThemeToggle from "./components/ThemeToggle";
 
-const API_KEY = "5d048d70e2ec77e86219f7e5f1256f22";
+const API_KEY = "05de3799f13701e05ffa7144adef9ef7";
 const BASE_URL = "https://api.themoviedb.org/3";
 const IMAGE_BASE = "https://image.tmdb.org/t/p/w342";
 const HOME_LIMIT = 16;
