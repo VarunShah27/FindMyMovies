@@ -2,7 +2,7 @@
 import React from "react";
 import Result from "./Result";
 
-const IMAGE_BASE_HERO = "https://image.tmdb.org/t/p/w500"; // larger poster for hero view
+const IMAGE_BASE_HERO = "https://image.tmdb.org/t/p/w500"; // bigger poster for hero
 
 function Results({ results, openPopup }) {
   if (!results || results.length === 0) {
@@ -17,23 +17,22 @@ function Results({ results, openPopup }) {
   if (results.length === 1 && results[0].overview) {
     const movie = results[0];
     const posterUrl = movie.poster_path
-      ? `${IMAGE_BASE_HERO}${movie.poster_path}`
+      ? movie.poster_path.startsWith("http")
+        ? movie.poster_path
+        : `${IMAGE_BASE_HERO}${movie.poster_path}`
       : "https://via.placeholder.com/500x750?text=No+Image";
 
     return (
-      <section
-        className="single-result-hero"
-        style={{ backgroundImage: `url(${posterUrl})` }}
-      >
+      <section className="single-result-hero" style={{ backgroundImage: `url(${posterUrl})` }}>
         <div className="hero-overlay"></div>
         <div className="hero-content">
-          <img loading="lazy" src={posterUrl} alt={movie.title} className="hero-poster" />
+          <img loading="lazy" src={posterUrl} alt={movie.title || "Movie Poster"} className="hero-poster" />
           <div className="hero-details">
-            <h1>{movie.title}</h1>
+            <h1>{movie.title || "N/A"}</h1>
             <p className="hero-meta">
-              {movie.release_date?.split("-")[0] || "N/A"} • ⭐ {movie.vote_average}/10
+              {movie.release_date ? movie.release_date.split("-")[0] : "N/A"} • ⭐ {movie.vote_average || "N/A"}/10
             </p>
-            <p className="hero-plot">{movie.overview}</p>
+            <p className="hero-plot">{movie.overview || "No description available."}</p>
             <button onClick={() => openPopup(movie.id)}>Show More Info</button>
           </div>
         </div>
@@ -45,7 +44,7 @@ function Results({ results, openPopup }) {
   return (
     <section className="results">
       {results.map((result) => (
-        <Result key={result.id} result={result} openPopup={openPopup} />
+        <Result key={result.id || Math.random()} result={result} openPopup={openPopup} />
       ))}
     </section>
   );
