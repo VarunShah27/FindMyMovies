@@ -45,7 +45,7 @@ const levenshteinDistance = (s1, s2) => {
 function App() {
   const [state, setState] = useState({ s: "", results: [], selected: {} });
   const [suggestion, setSuggestion] = useState("");
-  const apiurl = "http://www.omdbapi.com/?i=tt3896198&apikey=883a4c5";
+  const apiurl = "5d048d70e2ec77e86219f7e5f1256f22";
 
   useEffect(() => {
     const shuffled = popularMovies.sort(() => 0.5 - Math.random());
