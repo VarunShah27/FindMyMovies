@@ -147,7 +147,7 @@ function App() {
     <div className="App">
       <ThemeToggle />
       <header>
-        <h1><a href="/" style={{ textDecoration: "none", color: "inherit" }}>Find My Moviez</a></h1>
+        <h1><a href="/" style={{ textDecoration: "none", color: "inherit" }}>Find My Movies</a></h1>
       </header>
       <main>
         <Search value={searchTerm} handleInput={handleInput} search={handleSearchEvent} />
