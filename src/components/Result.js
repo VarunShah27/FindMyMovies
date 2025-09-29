@@ -1,14 +1,9 @@
 // src/components/Result.js
 import React from "react";
 
-const IMAGE_BASE_GRID = "https://image.tmdb.org/t/p/w342"; // medium-quality for grid
-
 function Result({ result, openPopup }) {
-  const poster = result.poster_path
-    ? result.poster_path.startsWith("http") 
-      ? result.poster_path 
-      : `${IMAGE_BASE_GRID}${result.poster_path}`
-    : "https://via.placeholder.com/342x513?text=No+Image";
+  // The poster path is now a full URL from App.js
+  const poster = result.poster_path;
 
   return (
     <div className="result" onClick={() => openPopup(result.id)}>
