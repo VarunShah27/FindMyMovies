@@ -14,12 +14,12 @@ const IMAGE_BASE = "https://image.tmdb.org/t/p/w342";
 const HOME_LIMIT = 16;
 
 const popularMovies = [
-  "Inception", "The Godfather", "Nikka Zaildar", "The Shawshank Redemption",
-  "Pulp Fiction","Carry on Jatta", "Forrest Gump", "The Matrix", "Ardaas", "Goodfellas",
-  "Interstellar", "Dhamaal", "PK", "Goreyan nu Daffa Karo", "The Green Mile",
-  "Manje Bistre", "Housefull 2", "Sikander 2", "Yaar Anmulle", "F1",
-  "Gladiator", "Joker", "Whiplash", "The Prestige", "Taarzan: The Wonder Car",
-  "Sholay", "Ashke", "Spider-Man: Into the Spider-Verse", "Transformers",
+  "Superman", "The Godfather", "Nikka Zaildar", "Dune: Part Two",
+  "Ballerina","Carry on Jatta", "Mission: Impossible - The Final Reckoning", "The Matrix", "Ardaas", "The Conjuring: Last Rites",
+  "Interstellar", "Chhaava", "PK", "Goreyan nu Daffa Karo", "Deadpool & Wolverine",
+  "Manje Bistre", "Saiyaara", "Sikander 2", "Yaar Anmulle", "F1",
+  "Gladiator", "Joker", "Furiosa: A Mad Max Saga", "Taarzan: The Wonder Car",
+  "Sholay", "Chal Mera Putt", "Spider-Man: Into the Spider-Verse", "Transformers",
   "Rabb da Radio 2", "The Avengers", "Angrej"
 ];
 
