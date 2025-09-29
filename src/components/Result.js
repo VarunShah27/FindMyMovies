@@ -6,7 +6,7 @@ const IMAGE_BASE_GRID = "https://image.tmdb.org/t/p/w342"; // medium-quality for
 function Result({ result, openPopup }) {
   const poster = result.poster_path
     ? `${IMAGE_BASE_GRID}${result.poster_path}`
-    : "https://via.placeholder.com/342x513?text=No+Image"; // placeholder
+    : "https://via.placeholder.com/342x513?text=No+Image";
 
   return (
     <div className="result" onClick={() => openPopup(result.id)}>
