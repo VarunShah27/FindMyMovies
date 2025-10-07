@@ -1,70 +1,26 @@
-# Getting Started with Create React App
+Project Description :
+A dynamic and responsive movie discovery web application built with React.js. "Find My Movies" provides users with an intuitive platform to search for movies, explore detailed information, and discover new films. The project was developed with a strong focus on creating a clean, engaging, and user-friendly experience, fetching real-time data from an external movie database API.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Key Features : 
+Real-Time Movie Search: Implemented a powerful search bar that dynamically queries a movie database API to fetch and display results as the user types.
 
-## Available Scripts
+Detailed Information Pages: Created dedicated routes for each movie, presenting comprehensive details such as the plot summary, cast, crew, user ratings, and release date.
 
-In the project directory, you can run:
+Fully Responsive Design: Ensured a seamless and visually appealing experience across all devices, including desktops, tablets, and mobile phones, using modern CSS techniques.
 
-### `npm start`
+Interactive User Interface: Developed with a component-based architecture in React, allowing for efficient state management and a fast, interactive user experience.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Technologies Used
+Frontend: React.js, HTML5, CSS3, JavaScript (ES6+)
+API: The Movie Database (TMDB) API for fetching all movie-related data.
+Routing: React Router for client-side navigation and creating a single-page application (SPA) experience.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Role & Responsibilities
+Acted as the sole developer, responsible for the entire frontend development lifecycle from conception to deployment.
+Designed the application's architecture and created reusable, stateful, and stateless components in React.js.
+Integrated the third-party TMDB API to fetch and display dynamic content.
+Implemented the complete UI/UX design, focusing on modern aesthetics and usability best practices.
+Managed application state and data flow effectively throughout the project.
 
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+GitHub Repository: https://github.com/VarunShah27/Find-My-Moviez.git
+Website Link : https://varunshah27.github.io/FindMyMovies/
